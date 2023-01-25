@@ -1,4 +1,7 @@
+import requests
 import streamlit as st
+
+API_URL = "http://localhost:8000/decisions/"
 
 st.markdown("# Add A New Decision")
 decision_id = st.text_input("Decision ID")
@@ -18,3 +21,7 @@ if st.button("Submit"):
         "review": reflection,
         "rating": rating,
     }
+    decision_url = API_URL + decision_id + "/"
+    response = requests.put(decision_url, json=data)
+    st.write(response.status_code)
+    st.write(response.json())

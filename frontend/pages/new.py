@@ -1,3 +1,4 @@
+import requests
 import streamlit as st
 
 API_URL = "http://localhost:8000/decisions/"
@@ -36,3 +37,7 @@ if st.button("Submit"):
         "expected_with_probabilities": str(predictions),
         "outcome": str(result),
     }
+
+    response = requests.post(API_URL, json=data)
+    st.write(response.status_code)
+    st.write(response.json())
