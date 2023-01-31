@@ -4,11 +4,17 @@ from datetime import date
 from enum import Enum
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-app = FastAPI()
-decisions = {}
-DecisionDb = dict[int, "Decision"]
+sqlite_file_name = "database.db"
+sqlite_url = f"sqlite:///{sqlite_file_name}"
+
+connect_args = {"check_same_thread": False}
+engine = create_engine(sqlite_url, echo=True, connect_args=connect_args)
+
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
 
 
 class Status(str, Enum):
@@ -17,7 +23,7 @@ class Status(str, Enum):
     Reviewed = "Reviewed"
 
 
-class AddDecision(BaseModel):
+class DecisionBase(SQLModel):
     name: str
     state_emotional: str
     situation: str
@@ -28,49 +34,79 @@ class AddDecision(BaseModel):
     outcome_ranges: str
     expected_with_probabilities: str
     outcome: str
-
-
-class UpdateDecision(BaseModel):
+    # next fields are not required for initial create
     time_made: date | None
     time_reviewed: date | None
-    status: Status = Status.Open
+    status: Status | None = Status.Open
     review: str | None
     rating: int | None = Field(None, gt=0, le=10)
 
 
-class Decision(AddDecision, UpdateDecision):
+class Decision(DecisionBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
     time_added: date = Field(default_factory=date.today)
 
 
+class DecisionCreate(DecisionBase):
+    pass
+
+
+class DecisionRead(DecisionBase):
+    id: int
+
+
+class DecisionUpdate(SQLModel):
+    time_made: date | None
+    time_reviewed: date | None
+    status: Status | None = Status.Open
+    review: str | None
+    rating: int | None = Field(None, gt=0, le=10)
+
+
+app = FastAPI()
+
+
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
+
+
 @app.get("/decisions/")
-async def get_decisions() -> DecisionDb:
-    return decisions
+async def get_decisions() -> list[DecisionRead]:
+    with Session(engine) as session:
+        decisions = session.exec(select(Decision)).all()
+        return decisions
 
 
 @app.get("/decisions/{decision_id}")
-async def get_decision(decision_id: int) -> Decision:
-    if decision_id not in decisions:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return decisions[decision_id]
+async def get_decision(decision_id: int) -> DecisionRead:
+    with Session(engine) as session:
+        decision = session.get(Decision, decision_id)
+        if not decision:
+            raise HTTPException(status_code=404, detail="Decision not found")
+        return decision
 
 
 @app.post("/decisions/")
-async def create_decision(add_decision: AddDecision) -> Decision:
-    next_id = len(decisions) + 1
-    decision = Decision(**add_decision.dict())
-    decisions[next_id] = decision
-    return decision
+async def create_decision(decision: DecisionCreate) -> Decision:
+    with Session(engine) as session:
+        db_decision = Decision.from_orm(decision)
+        session.add(db_decision)
+        session.commit()
+        session.refresh(db_decision)
+        return db_decision
 
 
 @app.put("/decisions/{decision_id}")
-async def update_decision(
-    decision_id: int, update_decision: UpdateDecision
-) -> Decision:
-    if decision_id not in decisions:
-        raise HTTPException(status_code=404, detail="Decision not found")
-    decision = decisions[decision_id]
-    data = update_decision.dict(exclude_unset=True)
-    for key, value in data.items():
-        setattr(decision, key, value)
-    decisions[decision_id] = decision
-    return decision
+async def update_decision(decision_id: int, decision: DecisionUpdate) -> Decision:
+    with Session(engine) as session:
+        db_decision = session.get(Decision, decision_id)
+        if not db_decision:
+            raise HTTPException(status_code=404, detail="Decision not found")
+        decision_data = decision.dict(exclude_unset=True)
+        for key, value in decision_data.items():
+            setattr(db_decision, key, value)
+        session.add(db_decision)
+        session.commit()
+        session.refresh(db_decision)
+        return db_decision
