@@ -71,15 +71,15 @@ def on_startup():
     create_db_and_tables()
 
 
-@app.get("/decisions/")
-async def get_decisions() -> list[DecisionRead]:
+@app.get("/decisions/", response_model=list[DecisionRead])
+async def get_decisions():
     with Session(engine) as session:
         decisions = session.exec(select(Decision)).all()
         return decisions
 
 
-@app.get("/decisions/{decision_id}")
-async def get_decision(decision_id: int) -> DecisionRead:
+@app.get("/decisions/{decision_id}", response_model=DecisionRead)
+async def get_decision(decision_id: int):
     with Session(engine) as session:
         decision = session.get(Decision, decision_id)
         if not decision:
@@ -87,8 +87,8 @@ async def get_decision(decision_id: int) -> DecisionRead:
         return decision
 
 
-@app.post("/decisions/")
-async def create_decision(decision: DecisionCreate) -> Decision:
+@app.post("/decisions/", response_model=Decision)
+async def create_decision(decision: DecisionCreate):
     with Session(engine) as session:
         db_decision = Decision.from_orm(decision)
         session.add(db_decision)
@@ -97,8 +97,8 @@ async def create_decision(decision: DecisionCreate) -> Decision:
         return db_decision
 
 
-@app.put("/decisions/{decision_id}")
-async def update_decision(decision_id: int, decision: DecisionUpdate) -> Decision:
+@app.put("/decisions/{decision_id}", response_model=Decision)
+async def update_decision(decision_id: int, decision: DecisionUpdate):
     with Session(engine) as session:
         db_decision = session.get(Decision, decision_id)
         if not db_decision:
