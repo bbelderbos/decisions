@@ -1,2 +1,4 @@
 [flake8]
-ignore = E501
+max-line-length = 100
+ignore = S101
+extend-immutable-calls = Depends, fastapi.Depends, fastapi.params.Depends
