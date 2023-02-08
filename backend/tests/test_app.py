@@ -69,3 +69,46 @@ def test_post_new_decision(client: TestClient):
         "expected_with_probabilities": "string",
         "outcome": "string",
     }
+
+
+def test_get_decision_after_creating_it(client: TestClient):
+    payload = {
+        "name": "sleep",
+        "state_emotional": "string",
+        "situation": "string",
+        "problem_statement": "string",
+        "variables": "string",
+        "complications": "string",
+        "alternatives": "string",
+        "outcome_ranges": "string",
+        "expected_with_probabilities": "string",
+        "outcome": "string",
+    }
+    response = client.post("/decisions", json=payload)
+    response = client.get("/decisions")
+    assert response.status_code == 200
+    assert response.json() == [
+        {
+            "name": "sleep",
+            "state_emotional": "string",
+            "situation": "string",
+            "problem_statement": "string",
+            "variables": "string",
+            "complications": "string",
+            "alternatives": "string",
+            "outcome_ranges": "string",
+            "expected_with_probabilities": "string",
+            "outcome": "string",
+            "time_made": None,
+            "time_reviewed": None,
+            "status": "Open",
+            "review": None,
+            "rating": None,
+            "id": 1,
+        }
+    ]
+
+
+def test_get_a_non_existing_decision(client: TestClient):
+    response = client.get("/decisions/7")
+    assert response.status_code == 404
