@@ -28,15 +28,9 @@ def client_fixture(session: Session):
     app.dependency_overrides.clear()
 
 
-def test_read_decisions(client: TestClient):
-    response = client.get("/decisions")
-    assert response.status_code == 200
-    assert response.json() == []
-
-
-@freeze_time("2023-01-06")
-def test_post_new_decision(client: TestClient):
-    payload = {
+@pytest.fixture
+def add_payload():
+    return {
         "name": "sleep",
         "state_emotional": "string",
         "situation": "string",
@@ -48,7 +42,28 @@ def test_post_new_decision(client: TestClient):
         "expected_with_probabilities": "string",
         "outcome": "string",
     }
-    response = client.post("/decisions", json=payload)
+
+
+@pytest.fixture
+def update_payload():
+    return {
+        "time_made": "2023-02-04",
+        "time_reviewed": "2023-02-06",
+        "status": "Made",
+        "review": "was good to get some more sleep!",
+        "rating": 10,
+    }
+
+
+def test_read_decisions(client: TestClient):
+    response = client.get("/decisions")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+@freeze_time("2023-01-06")
+def test_post_new_decision(client: TestClient, add_payload: dict):
+    response = client.post("/decisions", json=add_payload)
     assert response.status_code == 200
     assert response.json() == {
         "time_made": None,
@@ -71,20 +86,8 @@ def test_post_new_decision(client: TestClient):
     }
 
 
-def test_get_decision_after_creating_it(client: TestClient):
-    payload = {
-        "name": "sleep",
-        "state_emotional": "string",
-        "situation": "string",
-        "problem_statement": "string",
-        "variables": "string",
-        "complications": "string",
-        "alternatives": "string",
-        "outcome_ranges": "string",
-        "expected_with_probabilities": "string",
-        "outcome": "string",
-    }
-    response = client.post("/decisions", json=payload)
+def test_get_decision_after_creating_it(client: TestClient, add_payload: dict):
+    response = client.post("/decisions", json=add_payload)
     # via all decisions endpoint
     response = client.get("/decisions")
     assert response.status_code == 200
@@ -115,42 +118,16 @@ def test_get_decision_after_creating_it(client: TestClient):
     assert response.json() == expected[0]
 
 
-def test_get_or_update_non_existing_decision(client: TestClient):
+def test_get_or_update_non_existing_decision(client: TestClient, update_payload: dict):
     response = client.get("/decisions/7")
     assert response.status_code == 404
-    update_payload = {
-        "time_made": "2023-02-04",
-        "time_reviewed": "2023-02-06",
-        "status": "Made",
-        "review": "was good to get some more sleep!",
-        "rating": 10,
-    }
     response = client.put("/decisions/7", json=update_payload)
     assert response.status_code == 404
 
 
 @freeze_time("2023-01-06")
-def test_update_decision(client: TestClient):
-    payload = {
-        "name": "sleep",
-        "state_emotional": "string",
-        "situation": "string",
-        "problem_statement": "string",
-        "variables": "string",
-        "complications": "string",
-        "alternatives": "string",
-        "outcome_ranges": "string",
-        "expected_with_probabilities": "string",
-        "outcome": "string",
-    }
-    response = client.post("/decisions", json=payload)
-    update_payload = {
-        "time_made": "2023-02-04",
-        "time_reviewed": "2023-02-06",
-        "status": "Made",
-        "review": "was good to get some more sleep!",
-        "rating": 10,
-    }
+def test_update_decision(client: TestClient, add_payload: dict, update_payload: dict):
+    response = client.post("/decisions", json=add_payload)
     response = client.put("/decisions/1", json=update_payload)
     assert response.status_code == 200
     assert response.json() == {
