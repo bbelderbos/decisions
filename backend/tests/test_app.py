@@ -115,8 +115,17 @@ def test_get_decision_after_creating_it(client: TestClient):
     assert response.json() == expected[0]
 
 
-def test_get_a_non_existing_decision(client: TestClient):
+def test_get_or_update_non_existing_decision(client: TestClient):
     response = client.get("/decisions/7")
+    assert response.status_code == 404
+    update_payload = {
+        "time_made": "2023-02-04",
+        "time_reviewed": "2023-02-06",
+        "status": "Made",
+        "review": "was good to get some more sleep!",
+        "rating": 10,
+    }
+    response = client.put("/decisions/7", json=update_payload)
     assert response.status_code == 404
 
 
