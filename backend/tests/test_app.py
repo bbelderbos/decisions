@@ -85,9 +85,10 @@ def test_get_decision_after_creating_it(client: TestClient):
         "outcome": "string",
     }
     response = client.post("/decisions", json=payload)
+    # via all decisions endpoint
     response = client.get("/decisions")
     assert response.status_code == 200
-    assert response.json() == [
+    expected = [
         {
             "name": "sleep",
             "state_emotional": "string",
@@ -107,6 +108,11 @@ def test_get_decision_after_creating_it(client: TestClient):
             "id": 1,
         }
     ]
+    assert response.json() == expected
+    # via single decision endpoint
+    response = client.get("/decisions/1")
+    assert response.status_code == 200
+    assert response.json() == expected[0]
 
 
 def test_get_a_non_existing_decision(client: TestClient):
