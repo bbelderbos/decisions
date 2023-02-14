@@ -1,0 +1,36 @@
+name: End-to-end tests
+
+on: [push]
+
+jobs:
+  tests_e2e:
+    name: Run end-to-end tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+      - name: Add conda to system path
+        run: |
+          # $CONDA is an environment variable pointing to the root of the miniconda directory
+          echo $CONDA/bin >> $GITHUB_PATH
+      - name: Install dependencies
+        run: |
+          conda env create -f frontend/env.yml
+          source activate decisions-frontend
+          playwright install chromium
+      - name: Run application
+        run: |
+          docker compose build
+          docker compose up -d
+          sleep 10
+          source activate decisions-frontend
+          pytest test_end_to_end/test_frontend.py
+
+      - name: Upload Image Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: image-artifact
+          path: screenshot.png
