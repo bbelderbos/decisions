@@ -21,7 +21,6 @@ jobs:
           docker compose build
           docker compose up -d
           sleep 10
-          source activate decisions
           pytest test_end_to_end/test_frontend.py
 
       - name: Upload Image Artifact
