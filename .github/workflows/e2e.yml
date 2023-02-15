@@ -20,7 +20,7 @@ jobs:
         run: |
           conda env create -f frontend/env.yml
           source activate decisions
-          playwright install chromium
+          # playwright install chromium
       - name: Run application
         run: |
           docker compose build
