@@ -20,7 +20,6 @@ jsonschema==4.17.3
 markdown-it-py==2.1.0
 MarkupSafe==2.1.2
 mdurl==0.1.2
-numpy==1.24.1
 packaging==23.0
 pandas==1.5.3
 Pillow==9.4.0

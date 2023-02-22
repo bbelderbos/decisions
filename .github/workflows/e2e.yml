@@ -12,22 +12,16 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: "3.11"
-      - name: Add conda to system path
-        run: |
-          # $CONDA is an environment variable pointing to the root of the miniconda directory
-          echo $CONDA/bin >> $GITHUB_PATH
       - name: Install dependencies
         run: |
-          conda env create -f frontend/env.yml
-          source activate decisions
+          pip install -r frontend/requirements.txt
           playwright install chromium
       - name: Run application
         run: |
           docker compose build
           docker compose up -d
           sleep 10
-          source activate decisions
-          pytest test_end_to_end/test_frontend.py
+          pytest test_end_to_end/test_page_titles.py
 
       - name: Upload Image Artifact
         uses: actions/upload-artifact@v2
