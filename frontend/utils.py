@@ -15,11 +15,12 @@ def get_decision_data():
     if not data:
         df = pd.DataFrame(
             columns=[
+                "ID",
                 "Decision",
                 "Decision Date",
                 "Decision Status",
                 "Decision Review Date",
-                # "Archive",
+                "Archive",
             ]
         )
     else:
@@ -30,7 +31,7 @@ def get_decision_data():
                 "Decision Date": [row["time_made"] for row in data],
                 "Decision Status": [row["status"] for row in data],
                 "Decision Review Date": [row["time_reviewed"] for row in data],
-                # "Archive": [row["archived"] for row in data],
+                "Archive": [row["archived"] for row in data],
             }
         )
     return df

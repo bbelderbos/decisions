@@ -17,32 +17,26 @@ col3.metric(
 
 df = get_decision_data()
 
-# create state for archive status if it doesn't exist
-if "archive" not in st.session_state:
-    if df.empty:
-        st.session_state.archive = []
-    else:
-        st.session_state.archive = [False for _ in df.index]
-
-df["Archive"] = st.session_state.archive
 
 st.markdown("# Decisions")
-st.table(df)
+# st.table(df)
+
+
+col1, col2 = st.columns([2, 1])
+col2.write("#")
+button = col2.button("Archive")
 
 decision_name = col1.selectbox(
     "Select a decision", df[df["Archive"] == False]["Decision"]
 )
 
-st.markdown("# Decisions")
-col1, col2 = st.columns([2, 1])
-
-col2.write("#")
-button = col2.button("Archive")
-
 if button:
     if not df.empty:
-        df["Archive"][df["Decision"] == decision_name] = True
-        st.session_state.archive = df["Archive"].tolist()
+        id = df[df["Decision"] == decision_name]["ID"].values[0]
+        put_url = f"{API_URL}{id}/archive"
+        response = requests.put(put_url)
+        # st.write(response.status_code)
+        # st.write(response.json())
 
 df = get_decision_data()
 
