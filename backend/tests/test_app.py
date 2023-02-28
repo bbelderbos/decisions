@@ -83,6 +83,7 @@ def test_post_new_decision(client: TestClient, add_payload: dict):
         "outcome_ranges": "string",
         "expected_with_probabilities": "string",
         "outcome": "string",
+        "archived": False,
     }
 
 
@@ -109,6 +110,7 @@ def test_get_decision_after_creating_it(client: TestClient, add_payload: dict):
             "review": None,
             "rating": None,
             "id": 1,
+            "archived": False,
         }
     ]
     assert response.json() == expected
@@ -148,4 +150,33 @@ def test_update_decision(client: TestClient, add_payload: dict, update_payload: 
         "outcome_ranges": "string",
         "expected_with_probabilities": "string",
         "outcome": "string",
+        "archived": False,
     }
+
+
+def test_archive_decision(client: TestClient, add_payload: dict):
+    response = client.post("/decisions", json=add_payload)
+    assert response.json()["archived"] is False
+    response = client.put("/decisions/1/archive")
+    assert response.status_code == 200
+    assert response.json()["archived"] is True
+
+
+def test_unarchive_decision(client: TestClient, add_payload: dict):
+    client.post("/decisions", json=add_payload)
+    response = client.put("/decisions/1/archive")
+    assert response.json()["archived"] is True
+    response = client.put("/decisions/1/unarchive")
+    assert response.status_code == 200
+    assert response.json()["archived"] is False
+
+
+def test_cannot_unarchive_decision_if_already_made(
+    client: TestClient, add_payload: dict, update_payload: dict
+):
+    client.post("/decisions", json=add_payload)
+    # decision is now "made"
+    response = client.put("/decisions/1", json=update_payload)
+    response = client.put("/decisions/1/unarchive")
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Decision already made"
