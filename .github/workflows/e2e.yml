@@ -23,7 +23,7 @@ jobs:
         run: |
           docker compose up -d
           sleep 10
-          pytest test_end_to_end/test_frontend.py
+          pytest test_end_to_end/test_page_titles.py
 
       - name: Upload Image Artifact
         uses: actions/upload-artifact@v2
