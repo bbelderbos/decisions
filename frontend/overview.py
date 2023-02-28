@@ -1,5 +1,7 @@
 import pandas as pd
+import requests
 import streamlit as st
+from utils import get_decision_data
 
 API_URL = "http://localhost:8000/decisions/"
 
@@ -13,19 +15,39 @@ col3.metric(
     label="Average duration for crucial decisions", value="10 days", delta="-5 days"
 )
 
-df = pd.DataFrame(
-    {
-        "Decision": ["Lunch", "Decision 2", "Decision 3", "Decision 4"],
-        "Decision Date": ["2021-01-01", "2021-01-02", "2021-01-03", "2021-01-04"],
-        "Decision Status": ["Open", "Open", "Closed", "Closed"],
-        "Decision Review Date": [
-            "2021-03-01",
-            "2021-03-02",
-            "2021-03-03",
-            "2021-03-04",
-        ],
-    }
-)
+df = get_decision_data()
+
+# create state for archive status if it doesn't exist
+if "archive" not in st.session_state:
+    if df.empty:
+        st.session_state.archive = []
+    else:
+        st.session_state.archive = [False for _ in df.index]
+
+df["Archive"] = st.session_state.archive
 
 st.markdown("# Decisions")
 st.table(df)
+
+decision_name = col1.selectbox(
+    "Select a decision", df[df["Archive"] == False]["Decision"]
+)
+
+st.markdown("# Decisions")
+col1, col2 = st.columns([2, 1])
+
+col2.write("#")
+button = col2.button("Archive")
+
+if button:
+    if not df.empty:
+        df["Archive"][df["Decision"] == decision_name] = True
+        st.session_state.archive = df["Archive"].tolist()
+
+df = get_decision_data()
+
+st.table(
+    df[df["Archive"] == False][
+        ["Decision", "Decision Date", "Decision Status", "Decision Review Date"]
+    ]
+)
