@@ -45,6 +45,7 @@ class DecisionBase(SQLModel):
     status: Status | None = Status.Open
     review: str | None
     rating: int | None = Field(None, gt=0, le=10)
+    archived: bool = False
 
 
 class Decision(DecisionBase, table=True):
@@ -114,6 +115,40 @@ async def update_decision(
     decision_data = decision.dict(exclude_unset=True)
     for key, value in decision_data.items():
         setattr(db_decision, key, value)
+    session.add(db_decision)
+    session.commit()
+    session.refresh(db_decision)
+    return db_decision
+
+
+@app.put("/decisions/{decision_id}/archive", response_model=Decision)
+async def archive_decision(
+    *,
+    decision_id: int,
+    session: Session = Depends(get_session),
+):
+    db_decision = session.get(Decision, decision_id)
+    if not db_decision:
+        raise HTTPException(status_code=404, detail="Decision not found")
+    db_decision.archived = True
+    session.add(db_decision)
+    session.commit()
+    session.refresh(db_decision)
+    return db_decision
+
+
+@app.put("/decisions/{decision_id}/unarchive", response_model=Decision)
+async def unarchive_decision(
+    *,
+    decision_id: int,
+    session: Session = Depends(get_session),
+):
+    db_decision = session.get(Decision, decision_id)
+    if not db_decision:
+        raise HTTPException(status_code=404, detail="Decision not found")
+    if db_decision.status == Status.Made:
+        raise HTTPException(status_code=400, detail="Decision already made")
+    db_decision.archived = False
     session.add(db_decision)
     session.commit()
     session.refresh(db_decision)
