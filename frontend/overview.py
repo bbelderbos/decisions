@@ -1,9 +1,6 @@
-import pandas as pd
 import requests
 import streamlit as st
-from utils import get_decision_data
-
-API_URL = "http://localhost:8000/decisions/"
+from utils import API_URL, get_decision_data
 
 st.markdown("# Executive Summary 📈")
 st.sidebar.markdown("# Executive Summary 📈")
@@ -15,16 +12,14 @@ col3.metric(
     label="Average duration for crucial decisions", value="10 days", delta="-5 days"
 )
 
-df = get_decision_data()
-
 
 st.markdown("# Decisions")
-# st.table(df)
-
-
 col1, col2 = st.columns([2, 1])
+
 col2.write("#")
 button = col2.button("Archive")
+
+df = get_decision_data()
 
 decision_name = col1.selectbox(
     "Select a decision", df[df["Archive"] == False]["Decision"]
@@ -45,3 +40,4 @@ st.table(
         ["Decision", "Decision Date", "Decision Status", "Decision Review Date"]
     ]
 )
+
