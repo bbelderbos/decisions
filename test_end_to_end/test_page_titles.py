@@ -9,9 +9,7 @@ from playwright.sync_api import Page, expect
 
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-API_URL = (
-    "http://localhost:8501/decisions/" if DEBUG else "http://myapi:8501/decisions/"
-)
+API_URL = "http://localhost:8501/" if DEBUG else "http://myapi:8501/"
 
 
 def test_homepage(page: Page):
