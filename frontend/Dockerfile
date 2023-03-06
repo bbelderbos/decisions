@@ -7,7 +7,7 @@ COPY requirements.txt ./requirements.txt
 
 RUN pip3 install -r requirements.txt
 
-EXPOSE 8080
+EXPOSE 8501
 
 COPY . /app
 RUN rm settings.ini
