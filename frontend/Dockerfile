@@ -12,4 +12,4 @@ EXPOSE 8080
 COPY . /app
 
 
-CMD streamlit run --server.port 8080 --server.enableCORS false overview.py
+CMD streamlit run --server.port 8501 --server.enableCORS false overview.py
