@@ -10,6 +10,6 @@ RUN pip3 install -r requirements.txt
 EXPOSE 8080
 
 COPY . /app
-
+RUN rm settings.ini
 
 CMD streamlit run --server.port 8501 --server.enableCORS false overview.py
