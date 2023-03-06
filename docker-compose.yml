@@ -14,9 +14,9 @@ services:
   app:
     container_name: myapp
     build: frontend/.
-    command: "streamlit run --server.port 8080 --server.enableCORS false overview.py"
+    command: "streamlit run --server.port 8501 --server.enableCORS false overview.py"
     ports:
-      - "8080:8080"
+      - "8501:8501"
     networks:
       - frontend
   # db:

@@ -5,7 +5,7 @@ from decouple import config
 DEBUG = config("DEBUG", default=False, cast=bool)
 
 API_URL = (
-    "http://localhost:8000/decisions/" if DEBUG else "http://myapi:8000/decisions/"
+    "http://localhost:8501/decisions/" if DEBUG else "http://myapi:8501/decisions/"
 )
 st.markdown("# Add A New Decision")
 
