@@ -8,17 +8,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.11
+      - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
-          python-version: "3.11"
+          python-version: "3.10"
+      - run: docker-compose pull
+      - uses: satackey/action-docker-layer-caching@v0.0.11
       - name: Install dependencies
         run: |
           pip install -r frontend/requirements.txt
           playwright install chromium
+          docker compose build
       - name: Run application
         run: |
-          docker compose build
           docker compose up -d
           sleep 10
           pytest test_end_to_end/test_page_titles.py

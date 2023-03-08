@@ -1,8 +1,12 @@
 import requests
 import streamlit as st
+from decouple import config
 
-API_URL = "http://localhost:8000/decisions/"
+DEBUG = config("DEBUG", default=False, cast=bool)
 
+API_URL = (
+    "http://localhost:8000/decisions/" if DEBUG else "http://myapi:8000/decisions/"
+)
 st.markdown("# Add A New Decision")
 
 name = st.text_input("Decision Name")

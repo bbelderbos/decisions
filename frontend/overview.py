@@ -1,7 +1,6 @@
-import pandas as pd
+import requests
 import streamlit as st
-
-API_URL = "http://localhost:8000/decisions/"
+from utils import API_URL, get_decision_data
 
 st.markdown("# Executive Summary 📈")
 st.sidebar.markdown("# Executive Summary 📈")
@@ -13,19 +12,32 @@ col3.metric(
     label="Average duration for crucial decisions", value="10 days", delta="-5 days"
 )
 
-df = pd.DataFrame(
-    {
-        "Decision": ["Lunch", "Decision 2", "Decision 3", "Decision 4"],
-        "Decision Date": ["2021-01-01", "2021-01-02", "2021-01-03", "2021-01-04"],
-        "Decision Status": ["Open", "Open", "Closed", "Closed"],
-        "Decision Review Date": [
-            "2021-03-01",
-            "2021-03-02",
-            "2021-03-03",
-            "2021-03-04",
-        ],
-    }
-)
 
 st.markdown("# Decisions")
-st.table(df)
+col1, col2 = st.columns([2, 1])
+
+col2.write("#")
+button = col2.button("Archive")
+
+df = get_decision_data()
+
+decision_name = col1.selectbox(
+    "Select a decision", df[df["Archive"] == False]["Decision"]
+)
+
+if button:
+    if not df.empty:
+        id = df[df["Decision"] == decision_name]["ID"].values[0]
+        put_url = f"{API_URL}{id}/archive"
+        response = requests.put(put_url)
+        # st.write(response.status_code)
+        # st.write(response.json())
+
+df = get_decision_data()
+
+st.table(
+    df[df["Archive"] == False][
+        ["Decision", "Decision Date", "Decision Status", "Decision Review Date"]
+    ]
+)
+
