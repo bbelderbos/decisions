@@ -99,6 +99,30 @@ package:
   size: 96707
   timestamp: 1688651250785
 - platform: linux-64
+  name: brotli-python
+  version: 1.1.0
+  category: main
+  manager: conda
+  dependencies:
+  - libgcc-ng >=12
+  - libstdcxx-ng >=12
+  - python >=3.12.0rc3,<3.13.0a0
+  - python_abi 3.12.* *_cp312
+  url: https://conda.anaconda.org/conda-forge/linux-64/brotli-python-1.1.0-py312h30efb56_1.conda
+  hash:
+    md5: 45801a89533d3336a365284d93298e36
+    sha256: b68706698b6ac0d31196a8bcb061f0d1f35264bcd967ea45e03e108149a74c6f
+  build: py312h30efb56_1
+  arch: x86_64
+  subdir: linux-64
+  build_number: 1
+  constrains:
+  - libbrotlicommon 1.1.0 hd590300_1
+  license: MIT
+  license_family: MIT
+  size: 350604
+  timestamp: 1695990206327
+- platform: linux-64
   name: bzip2
   version: 1.0.8
   category: main
@@ -176,6 +200,26 @@ package:
   license_family: MIT
   size: 294523
   timestamp: 1696001868949
+- platform: linux-64
+  name: charset-normalizer
+  version: 3.3.2
+  category: main
+  manager: conda
+  dependencies:
+  - python >=3.7
+  url: https://conda.anaconda.org/conda-forge/noarch/charset-normalizer-3.3.2-pyhd8ed1ab_0.conda
+  hash:
+    md5: 7f4a9e3fcff3f6356ae99244a014da6a
+    sha256: 20cae47d31fdd58d99c4d2e65fbdcefa0b0de0c84e455ba9d6356a4bdbc4b5b9
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: linux-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 46597
+  timestamp: 1698833765762
 - platform: linux-64
   name: click
   version: 8.1.7
@@ -818,6 +862,27 @@ package:
   size: 1598839
   timestamp: 1700664401096
 - platform: linux-64
+  name: pysocks
+  version: 1.7.1
+  category: main
+  manager: conda
+  dependencies:
+  - __unix
+  - python >=3.8
+  url: https://conda.anaconda.org/conda-forge/noarch/pysocks-1.7.1-pyha2e5f31_6.tar.bz2
+  hash:
+    md5: 2a7de29fb590ca14b5243c4c812c8025
+    sha256: a42f826e958a8d22e65b3394f437af7332610e43ee313393d1cf143f0a2d274b
+  build: pyha2e5f31_6
+  arch: x86_64
+  subdir: linux-64
+  build_number: 6
+  license: BSD-3-Clause
+  license_family: BSD
+  noarch: python
+  size: 18981
+  timestamp: 1661604969727
+- platform: linux-64
   name: python
   version: 3.12.0
   category: main
@@ -911,6 +976,32 @@ package:
   license_family: GPL
   size: 281456
   timestamp: 1679532220005
+- platform: linux-64
+  name: requests
+  version: 2.31.0
+  category: main
+  manager: conda
+  dependencies:
+  - certifi >=2017.4.17
+  - charset-normalizer >=2,<4
+  - idna >=2.5,<4
+  - python >=3.7
+  - urllib3 >=1.21.1,<3
+  url: https://conda.anaconda.org/conda-forge/noarch/requests-2.31.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: a30144e4156cdbb236f99ebb49828f8b
+    sha256: 9f629d6fd3c8ac5f2a198639fe7af87c4db2ac9235279164bfe0fcb49d8c4bad
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: linux-64
+  build_number: 0
+  constrains:
+  - chardet >=3.0.2,<6
+  license: Apache-2.0
+  license_family: APACHE
+  noarch: python
+  size: 56690
+  timestamp: 1684774408600
 - platform: linux-64
   name: sniffio
   version: 1.3.0
@@ -1076,6 +1167,28 @@ package:
   noarch: generic
   size: 117580
   timestamp: 1680041306008
+- platform: linux-64
+  name: urllib3
+  version: 2.1.0
+  category: main
+  manager: conda
+  dependencies:
+  - brotli-python >=1.0.9
+  - pysocks >=1.5.6,<2.0,!=1.5.7
+  - python >=3.7
+  url: https://conda.anaconda.org/conda-forge/noarch/urllib3-2.1.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: f8ced8ee63830dec7ecc1be048d1470a
+    sha256: eff5029820b4eaeab3a291a39854a6cd8fc8c4216264087f68c2d8d59822c869
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: linux-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 85324
+  timestamp: 1699933655057
 - platform: linux-64
   name: uvicorn
   version: 0.24.0.post1
