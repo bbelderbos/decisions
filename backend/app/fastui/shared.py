@@ -11,18 +11,18 @@ def demo_page(*components: AnyComponent, title: str | None = None) -> list[AnyCo
             title_event=GoToEvent(url='/'),
             links=[
                 c.Link(
-                    components=[c.Text(text='Components')],
-                    on_click=GoToEvent(url='/components'),
+                    components=[c.Text(text='Decisions')],
+                    on_click=GoToEvent(url='/decisions'),
                     active='startswith:/components',
                 ),
                 c.Link(
-                    components=[c.Text(text='Tables')],
-                    on_click=GoToEvent(url='/table/cities'),
+                    components=[c.Text(text='Archive')],
+                    on_click=GoToEvent(url='/archive'),
                     active='startswith:/table',
                 ),
                 c.Link(
-                    components=[c.Text(text='Forms')],
-                    on_click=GoToEvent(url='/forms/login'),
+                    components=[c.Text(text='Review')],
+                    on_click=GoToEvent(url='/review'),
                     active='startswith:/forms',
                 ),
             ],

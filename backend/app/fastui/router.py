@@ -10,11 +10,18 @@ from fastui.events import BackEvent, GoToEvent
 from sqlmodel import Session, select
 
 from .models import BigModel, FormKind, LoginForm, SelectForm
+from .shared import demo_page
 
 router = APIRouter()
 
+@router.get('/api/', response_model=FastUI, response_model_exclude_none=True)
+def api_index() -> list[AnyComponent]:
+    # language=markdown
+    markdown = """This app provides you with guidance on how to prepare, make and review crucial decisions."""
+    return demo_page(c.Markdown(text=markdown), title="Home")
 
-@router.get("/api/", response_model=FastUI, response_model_exclude_none=True)
+
+@router.get("/api/decisions", response_model=FastUI, response_model_exclude_none=True)
 def decisions_table(*, session: Session = Depends(get_session)) -> list[AnyComponent]:
     """
     Show a table of four users, `/api` is the endpoint the frontend will connect to
@@ -22,27 +29,23 @@ def decisions_table(*, session: Session = Depends(get_session)) -> list[AnyCompo
     """
     decisions = session.exec(select(Decision)).all()
 
-    return [
-        c.Page(  # Page provides a basic container for components
-            components=[
-                c.Heading(text="Decisions", level=2),  # renders `<h2>Users</h2>`
-                c.Table[
-                    Decision
-                ](  # c.Table is a generic component parameterized with the model used for rows
-                    data=decisions,
-                    # define two columns for the table
-                    columns=[
-                        DisplayLookup(
-                            field="name", on_click=GoToEvent(url="/decision/{id}/")
-                        ),
-                        DisplayLookup(field="id"),
-                        DisplayLookup(field="time_made", mode=DisplayMode.date),
-                        DisplayLookup(field="status"),
-                    ],
+    return demo_page(
+        c.Table[
+            Decision
+        ](  # c.Table is a generic component parameterized with the model used for rows
+            data=decisions,
+            # define two columns for the table
+            columns=[
+                DisplayLookup(
+                    field="name", on_click=GoToEvent(url="/decision/{id}/")
                 ),
-            ]
+                DisplayLookup(field="id"),
+                DisplayLookup(field="time_made", mode=DisplayMode.date),
+                DisplayLookup(field="status"),
+            ],
         ),
-    ]
+        title="Decisions"
+        )
 
 
 @router.get(
