@@ -30,17 +30,17 @@
             "request": "launch",
             "module": "uvicorn",
             "args": [
-                "main:app",
+                "app.main:app",
                 "--host",
                 "localhost",
                 "--port",
-                "8000",
+                "8080",
                 "--reload"
             ],
-            "cwd": "${workspaceFolder}/backend/app/",
+            "cwd": "${workspaceFolder}/backend/",
             "jinja": true,
             "justMyCode": false,
-            "python": "/home/rbeer/anaconda3/envs/decisions-backend/bin/python",
+            "python": "/home/zaubeerer/code/pdm/code_clinics/decisions/backend/.pixi/env/bin/python",
         },
     ],
     "compounds": [

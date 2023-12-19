@@ -1,0 +1,15 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add a short description here"
+authors = ["Robin Beer <r.beer@outlook.de>"]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tasks]
+
+[dependencies]
+fastapi = "0.105.0.*"
+fastui = "0.3.0.*"
+uvicorn = "0.24.0.post1.*"
+sqlmodel = "0.0.14.*"
