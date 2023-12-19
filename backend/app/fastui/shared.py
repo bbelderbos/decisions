@@ -13,7 +13,17 @@ def demo_page(*components: AnyComponent, title: str | None = None) -> list[AnyCo
                 c.Link(
                     components=[c.Text(text='Decisions')],
                     on_click=GoToEvent(url='/decisions'),
-                    active='startswith:/components',
+                    active='startswith:/decisions',
+                ),
+                c.Link(
+                    components=[c.Text(text='New')],
+                    on_click=GoToEvent(url='/new'),
+                    active='startswith:/forms',
+                ),
+                c.Link(
+                    components=[c.Text(text='Update')],
+                    on_click=GoToEvent(url='/review'),
+                    active='startswith:/forms',
                 ),
                 c.Link(
                     components=[c.Text(text='Archive')],
@@ -21,9 +31,9 @@ def demo_page(*components: AnyComponent, title: str | None = None) -> list[AnyCo
                     active='startswith:/table',
                 ),
                 c.Link(
-                    components=[c.Text(text='Review')],
-                    on_click=GoToEvent(url='/review'),
-                    active='startswith:/forms',
+                    components=[c.Text(text='Login')],
+                    on_click=GoToEvent(url='/login'),
+                    active='startswith:/table',
                 ),
             ],
         ),

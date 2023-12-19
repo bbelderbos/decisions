@@ -1,20 +1,27 @@
+from typing import Annotated
 
 from app.api.database import get_session
-from app.api.models import Decision
+from app.api.models import Decision, DecisionCreate
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastui import AnyComponent, FastUI, prebuilt_html
 from fastui import components as c
 from fastui.components.display import DisplayLookup, DisplayMode
 from fastui.events import BackEvent, GoToEvent
+from fastui.forms import FormResponse, fastui_form
+from pydantic import BaseModel, EmailStr, Field, SecretStr
 from sqlmodel import Session, select
 
-from .models import BigModel, FormKind, LoginForm, SelectForm
 from .shared import demo_page
 
 router = APIRouter()
 
-@router.get('/api/', response_model=FastUI, response_model_exclude_none=True)
+class LoginForm(BaseModel):
+    email: EmailStr = Field(title='Email Address', description="Try 'x@y' to trigger server side validation")
+    password: SecretStr
+
+
+@router.get("/api/", response_model=FastUI, response_model_exclude_none=True)
 def api_index() -> list[AnyComponent]:
     # language=markdown
     markdown = """This app provides you with guidance on how to prepare, make and review crucial decisions."""
@@ -36,16 +43,22 @@ def decisions_table(*, session: Session = Depends(get_session)) -> list[AnyCompo
             data=decisions,
             # define two columns for the table
             columns=[
-                DisplayLookup(
-                    field="name", on_click=GoToEvent(url="/decision/{id}/")
-                ),
+                DisplayLookup(field="name", on_click=GoToEvent(url="/decision/{id}/")),
                 DisplayLookup(field="id"),
                 DisplayLookup(field="time_made", mode=DisplayMode.date),
                 DisplayLookup(field="status"),
             ],
         ),
-        title="Decisions"
-        )
+        c.Div(
+            components=[
+                c.Link(
+                    components=[c.Button(text="New Decision")],
+                    on_click=GoToEvent(url="/new"),
+                ),
+            ]
+        ),
+        title="Decisions",
+    )
 
 
 @router.get(
@@ -75,28 +88,29 @@ def decision_profile(
     ]
 
 
+@router.get("/api/new", response_model=FastUI, response_model_exclude_none=True)
+def new_decision() -> list[AnyComponent]:
+    return demo_page(
+        c.Heading(text="New Decision", level=2),
+        c.Paragraph(text="Create a new decision."),
+        c.ModelForm[DecisionCreate](
+            submit_url="/api/decisions",
+            # success_event=PageEvent(url="form_success"),
+        ),
+    )
 
-@router.get("/content/{kind}", response_model=FastUI, response_model_exclude_none=True)
-def form_content(kind: FormKind):
-    match kind:
-        case "login":
-            return [
-                c.Heading(text="Login Form", level=2),
-                c.Paragraph(text="Simple login form with email and password."),
-                c.ModelForm[LoginForm](submit_url="/api/forms/login"),
-            ]
-        case "select":
-            return [
-                c.Heading(text="Select Form", level=2),
-                c.Paragraph(text="Form showing different ways of doing select."),
-                c.ModelForm[SelectForm](submit_url="/api/forms/select"),
-            ]
-        case "big":
-            return [
-                c.Heading(text="Large Form", level=2),
-                c.Paragraph(text="Form with a lot of fields."),
-                c.ModelForm[BigModel](submit_url="/api/forms/big"),
-            ]
+
+@router.post("/api/decisions", response_model=FastUI, response_model_exclude_none=True)
+async def login_form_post(
+    form: Annotated[DecisionCreate, fastui_form(DecisionCreate)],
+) -> FormResponse:
+    print(form)
+
+    # requests.post("http://localhost:8000/decisions/", json=form.model_dump_json())
+    # return [c.FireEvent(event=GoToEvent(url='/'))]
+
+    return FormResponse(event=GoToEvent(url="/api/decisions"))
+
 
 @router.get("/{path:path}")
 async def html_landing() -> HTMLResponse:
